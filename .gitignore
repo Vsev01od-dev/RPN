@@ -1,0 +1,116 @@
+# Игнорирование пользовательских файлов
+*.user
+*.userosscache
+*.sln.docstates
+
+# Игнорирование результатов сборки
+[Bb]in/
+[Oo]bj/
+x64/
+x86/
+[Bb]uild/
+[Bb]uilds/
+[Oo]ut/
+
+# Файлы резервных копий и временные файлы
+*.[Cc]ache
+*.ilk
+*.meta
+*.obj
+*.pch
+*.pdb
+*.pgc
+*.pgd
+*.rsp
+*.sbr
+*.tlb
+*.tli
+*.tlh
+*.tmp
+*.tmp_proj
+*.log
+*.vspscc
+*.vssscc
+.builds
+*.pidb
+*.svclog
+*.scc
+
+# Файлы Visual Studio
+.vs/
+.vscode/
+*.VC.opendb
+*.VC.db
+*.suo
+*.sln
+*.VC.VC.opendb
+*.VC.db
+TestResults/
+
+# Резервные копии
+*~
+Thumbs.db
+
+# Автогенерируемые файлы
+*.autosave
+DerivedDataCache/
+
+# Файлы пакетов NuGet
+packages/
+*.nupkg
+NuGet.Config
+.nuget/
+
+# Файлы ReSharper
+_ReSharper*/
+*.Resharper
+*.DotSettings.user
+
+# Файлы Rider
+.idea/
+*.sln.iml
+
+# Тестовые файлы (если они генерируются)
+*.asa
+*.cta
+*.lab
+*.fun
+
+# Исключения для системных файлов
+.DS_Store
+Desktop.ini
+
+# Временные файлы компилятора
+ipch/
+*.aps
+*.ncb
+*.opensdf
+*.sdf
+*.db
+
+# Файлы отладки
+*.pdb
+*.idb
+
+# Файлы профилирования
+*.psess
+*.vsp
+*.vspx
+
+# Файлы инсталляции
+*.cab
+*.msi
+*.msm
+*.msp
+
+# Документация
+*.chm
+*.chw
+
+# Исходники, но не код
+*.mp
+*.mpj
+
+# Игнорирование локальных настроек
+Local.settings
+*.local

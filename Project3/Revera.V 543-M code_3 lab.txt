@@ -1,0 +1,436 @@
+#include <iostream>
+#include <fstream>
+#include <conio.h>
+#include <string>
+
+using namespace std;
+
+class elementRecord
+{
+	public:
+		char elementType;
+		char elementValue;
+	public:
+		elementRecord()
+		{
+			elementType = 0;
+			elementValue = 0;
+		}
+};
+
+int main()
+{
+	setlocale(LC_ALL, "Russian");
+
+	ifstream inFile;
+	ifstream inFile2;
+
+	ofstream outFile;
+
+	string fileName;
+
+	char elementType;
+	char elementValue;
+	char c;
+	char rpn[5000];
+
+	elementRecord* stackKA = new elementRecord[1000];
+
+	int spKA;
+	int promCount = -1;
+	int consTable[255];
+	int labTable[255];
+	int funcTable[255];
+	int intTable[255];
+	int promTable[255];
+	int spl;
+	int rpnLength;
+	int curElem;
+	int stackC[5000];
+	int spC;
+	int *iPtr1; 
+	int *iPtr2;
+
+	unsigned short elementNum;
+	unsigned short identificationCount;
+	unsigned short i;
+	unsigned short j; 
+	unsigned short consCount;
+	unsigned short labCount;
+	unsigned short funCount;
+	unsigned short integerCount;
+	unsigned short arrayCount;
+	unsigned short identTable[255];
+
+	bool isArray[255];
+
+	int arrTable[255][255];
+	int *ptr1;
+	int	*ptr2;
+	int *stackl[5000];
+	int tmp;
+
+
+	cout << "Производится запуск программы." << endl;
+	cout << "Производится открытие файла - test.asa" << endl;
+	
+	inFile.open("test.asa", ios::in);
+	if (inFile)
+	{
+		spKA = -1;
+		identificationCount = 0;
+		for (i = 0; i < 255; i++) {
+			isArray[i] = false;
+		}
+		cout << "Производится считывание файла - test.asa" << endl;
+		while (!inFile.eof())
+		{
+			inFile >> elementType;
+			inFile >> elementValue;
+			switch (elementType)
+			{
+			case 'I': {}
+			case 'C': {}
+			case 'L': {}
+			case 'F': {
+				spKA++;
+				stackKA[spKA].elementType = elementType;
+				stackKA[spKA].elementValue = elementValue;
+				if (elementType == 'I')
+				{
+					elementNum = (int)elementValue;
+					if (elementNum > identificationCount)
+					{
+						identificationCount = elementNum;
+					}
+				}
+				break;
+			}
+			case '0':
+				switch (elementValue)
+				{
+				case '+': {}
+				case '-': {}
+				case '*': {}
+				case '/': {}
+				case '\\': {}
+				case '<': {}
+				case '>': {}
+				case '=': {}
+				case '^': {}
+				case '~': {}
+				case '$': {}
+				case 'E':
+					if ((elementValue == 'E') && (stackKA[spKA - 1].elementType == 'I'))
+					{
+						isArray[(int)stackKA[spKA - 1].elementValue] = true;
+						spKA--;
+						stackKA[spKA].elementType = 'P';
+					}
+					break;
+				case '@':
+				case 'Z':
+				case '%':
+					spKA = spKA - 2;
+					break;
+				case 'R':
+					stackKA[spKA].elementType = 'P';
+					break;
+				case 'I':
+				case 'O':
+				case 'J':
+				case 'G':
+					spKA--;
+					break;
+				default:
+					break;
+				}
+				break;
+			default:
+				break;
+			}
+		}
+		inFile.close();
+		integerCount = 0;
+		arrayCount = 0;
+		for (i = 0; i < identificationCount; i++)
+		{
+			if (isArray[i])
+			{
+				arrayCount++;
+				identTable[i] = arrayCount;
+			}
+			else
+			{
+				integerCount++;
+				identTable[i] = integerCount;
+			}
+		}
+		inFile.open("test.cta", ios::in);
+		if (inFile)
+		{
+			inFile >> consCount;
+			for (i = 0; i < consCount; i++)
+			{
+				inFile >> consTable[i];
+			}
+			inFile.close();
+		}
+		inFile2.open("test.lab", ios::in);
+		if (inFile2)
+		{
+			labCount = 0;
+			while (!inFile2.eof())
+			{
+				labCount++;
+				inFile2 >> labTable[labCount - 1];
+			}
+			inFile2.close();
+		}
+		inFile2.open("test.fun", ios::in);
+		if (inFile2)
+		{
+			funCount = 0;
+			while (!inFile2.eof())
+			{
+				funCount++;
+				inFile2 >> funcTable[funCount - 1];
+			}
+			inFile2.close();
+		}
+	}
+	inFile.open("test.asa", ios::in);
+	if (inFile)
+	{
+		spl = -1;
+		spC = -1;
+		for (i = 0; i < arrayCount; i++)
+		{
+			for (j = 0; j < 255; j++)
+				arrTable[i][j] = 0;
+		}
+		cout << "#Пример. Вычисление суммы от 1 до N" << endl;
+		rpnLength = 0;
+		while (!inFile.eof())
+		{
+			inFile >> rpn[rpnLength];
+			inFile >> rpn[rpnLength + 1];
+			rpnLength += 2;
+		}
+		curElem = 0;
+		while (curElem < rpnLength - 1)
+		{
+			elementType = rpn[curElem];
+			elementValue = rpn[curElem + 1];
+			switch (elementType)
+			{
+			case 'I':
+				if (isArray[(int)elementValue])
+				{
+					ptr1 = arrTable[identTable[(int)elementValue - 1] - 1];
+				}
+				else
+					ptr1 = &(intTable[identTable[(int)elementValue - 1] - 1]);
+				spl++;
+				stackl[spl] = ptr1;
+				break;
+			case 'C':
+				ptr1 = &(consTable[identTable[(int)elementValue - 1] - 1]);
+				spl++;
+				stackl[spl] = ptr1;
+				break;
+			case 'L':
+				ptr1 = &(labTable[(int)elementValue - 1]);
+				spl++;
+				stackl[spl] = ptr1;
+				break;
+			case 'F':
+				ptr1 = &(funcTable[identTable[(int)elementValue - 1] - 1]);
+				spl++;
+				stackl[spl] = ptr1;
+				break;
+			case 'O':
+				switch (elementValue)
+				{
+				case '+':
+				case '-':
+				case '*':
+				case '/':
+				case '\\':
+				case '<':
+				case '>':
+				case '=':
+				case '^':
+				case '~':
+				case '$':
+					iPtr1 = stackl[spl - 1];
+					iPtr2 = stackl[spl];
+					spl--;
+					promCount++;
+					if (elementValue == '+')
+					{
+						promTable[promCount] = (*iPtr1) + (*iPtr2);
+					}
+					if (elementValue == '-')
+					{
+						promTable[promCount] = (*iPtr1) - (*iPtr2);
+					}
+					if (elementValue == '*')
+					{
+						promTable[promCount] = (*iPtr1) * (*iPtr2);
+					}
+					if (elementValue == '/')
+					{
+						promTable[promCount] = (*iPtr1) / (*iPtr2);
+					}
+					if (elementValue == '\\')
+					{
+						promTable[promCount] = (*iPtr1) % (*iPtr2);
+					}
+					if (elementValue == '<')
+					{
+						if ((*iPtr1) < (*iPtr2))
+							promTable[promCount] = 1;
+						else
+							promTable[promCount] = 0;
+					}
+					if (elementValue == '>')
+					{
+						if ((*iPtr1) > (*iPtr2))
+							promTable[promCount] = 1;
+						else
+							promTable[promCount] = 0;
+
+					}
+					if (elementValue == '~')
+					{
+						if ((*iPtr1) <= (*iPtr2))
+							promTable[promCount] = 1;
+						else
+							promTable[promCount] = 0;
+					}
+					if (elementValue == '$')
+					{
+						if ((*iPtr1) >= (*iPtr2))
+							promTable[promCount] = 1;
+						else
+							promTable[promCount] = 0;
+					}
+					if (elementValue == '=')
+					{
+						if ((*iPtr1) == (*iPtr2))
+							promTable[promCount] = 1;
+						else
+							promTable[promCount] = 0;
+					}
+					if (elementValue == '^')
+					{
+						if ((*iPtr1) != (*iPtr2))
+							promTable[promCount] = 1;
+						else
+							promTable[promCount] = 0;
+					}
+					stackl[spl] = &(promTable[promCount]);
+					break;
+				case '@':
+					iPtr1 = stackl[spl - 1];
+					iPtr2 = stackl[spl];
+					spl = spl - 2;
+					(*iPtr1) = (*iPtr2);
+					break;
+				case 'H':
+					system("pause");
+					return 0;
+				case 'I':
+					iPtr1 = stackl[spl];
+					spl--;
+					cout << "Введите число для вычисления: " << endl;
+					cin >> (*iPtr1);
+					break;
+				case 'O':
+					iPtr1 = stackl[spl];
+					spl--;
+					cout << (*iPtr1);
+					break;
+				case 'J':
+					iPtr1 = stackl[spl];
+					spl--;
+					curElem = (*iPtr1) - 2;
+					break;
+				case 'Z':
+					iPtr1 = stackl[spl - 1];
+					iPtr2 = stackl[spl];
+					spl = spl - 2;
+					if ((*iPtr1) == 0)
+						curElem = (*iPtr2) - 2;
+					break;
+				case 'E':
+					ptr1 = stackl[spl - 1];
+					iPtr1 = stackl[spl];
+					spl--;
+					tmp = (*ptr1) + 2 * (*iPtr1);
+					stackl[spl] = &tmp;
+					break;
+				case '%':
+					iPtr1 = stackl[spl - 1];
+					iPtr2 = stackl[spl];
+					spl = spl - 2;
+					spC++;
+					stackC[spC] = curElem + 2;
+					for (i = 0; i < integerCount; i++)
+					{
+						spC++;
+						stackC[spC] = intTable[i];
+					}
+					for (i = 0; i < arrayCount; i++)
+					{
+						for (j = 0; j < 255; j++)
+						{
+							spC++;
+							stackC[spC] = arrTable[i][j];
+						}
+
+					}
+					spC++;
+					stackC[spC] = (*iPtr2);
+					curElem = (*iPtr1) - 2;
+					break;
+				case 'G':
+					iPtr1 = stackl[spl];
+					spl--;
+					(*iPtr1) = stackC[spC];
+					spC--;
+					break;
+				case 'R':
+					for (i = arrayCount - 1; i >= 0; i--)
+					{
+						for (j = 254; j >= 0; j--)
+						{
+							arrTable[i][j] = stackC[spC];
+							spC--;
+						}
+					}
+					for (i = integerCount - 1; i >= 0; i--)
+					{
+
+						intTable[i] = stackC[spC];
+						spC--;
+					}
+					curElem = stackC[spC] - 2;
+					spC--;
+					break;
+				default:
+					break;
+				}
+				break;
+			}
+			curElem = curElem + 2;
+		}
+		for (i = 0; i < arrayCount; i++)
+		{
+			free(arrTable[i]);
+		}
+		inFile.close();
+	}
+	system("pause");
+}
